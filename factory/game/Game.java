@@ -121,7 +121,4 @@ public class Game{
         gameDialog.init();
 
     }
-
-
-
 }
