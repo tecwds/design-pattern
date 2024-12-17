@@ -3,21 +3,20 @@ package state;
 abstract class State {
     protected TissueMachine tissueMachine;
 
+    //投币
     public void insertQuarter() {
-        //投币
     }
 
+    //退币
     public void ejectQuarter() {
-        //退币
     }
 
+    //按下“出纸巾”按钮
     public void turnCrank() {
-        //按下“出纸巾”按钮
-
     }
 
+    //出纸巾
     public void dispense() {
-        //出纸巾
     }
 
     public abstract void printState();
@@ -41,7 +40,6 @@ class TissueMachine {
         soldState = new SoldState(this);
         state = noQuarterState;
     }
-
 
     public State getHasQuarterState() {
         return hasQuarterState;
@@ -72,26 +70,23 @@ class TissueMachine {
     }
 
 
+    //投币
     public void insertQuarter() {
-        //投币
         this.state.insertQuarter();
     }
 
+    //退币
     public void ejectQuarter() {
-        //退币
         this.state.ejectQuarter();
     }
 
-
+    //按下“出纸巾”按钮
     public void turnCrank() {
-        //按下“出纸巾”按钮
         this.state.turnCrank();
-
     }
 
-
+    //出纸巾
     public void dispense() {
-        //出纸巾
         this.state.dispense();
     }
 
@@ -99,8 +94,17 @@ class TissueMachine {
 
 class SoldState extends State {
 
-    SoldState(TissueMachine tissueMachine) {
+    public SoldState(TissueMachine tissueMachine) {
         super.tissueMachine = tissueMachine;
+    }
+
+    @Override
+    public void dispense() {
+        if (tissueMachine.getCount() == 0) {
+            tissueMachine.setState(tissueMachine.getSoldOutState());
+            return;
+        }
+        tissueMachine.setState(tissueMachine.getNoQuarterState());
     }
 
     @Override
@@ -110,7 +114,7 @@ class SoldState extends State {
 }
 
 class SoldOutState extends State {
-    SoldOutState(TissueMachine tissueMachine) {
+    public SoldOutState(TissueMachine tissueMachine) {
         super.tissueMachine = tissueMachine;
     }
 
@@ -122,8 +126,14 @@ class SoldOutState extends State {
 
 class NoQuarterState extends State {
 
-    NoQuarterState(TissueMachine tissueMachine) {
+    public NoQuarterState(TissueMachine tissueMachine) {
         super.tissueMachine = tissueMachine;
+    }
+
+    @Override
+    public void insertQuarter() {
+        // 投币，切换状态
+        super.tissueMachine.setState(tissueMachine.getHasQuarterState());
     }
 
     @Override
@@ -134,8 +144,30 @@ class NoQuarterState extends State {
 
 class HasQuarterState extends State {
 
-    HasQuarterState(TissueMachine tissueMachine) {
+    public HasQuarterState(TissueMachine tissueMachine) {
         super.tissueMachine = tissueMachine;
+    }
+
+    @Override
+    public void insertQuarter() {
+        super.insertQuarter();
+    }
+
+    @Override
+    public void ejectQuarter() {
+        // 退币，切换称 No 币状态
+        tissueMachine.setState(tissueMachine.getNoQuarterState());
+    }
+
+    @Override
+    public void turnCrank() {
+        // 取纸巾
+        tissueMachine.setState(tissueMachine.getSoldState());
+    }
+
+    @Override
+    public void dispense() {
+        super.dispense();
     }
 
     @Override
@@ -143,7 +175,6 @@ class HasQuarterState extends State {
         System.out.println("HasQuarterState");
     }
 }
-
 
 public class SaleState {
     public static void main(String[] args) {

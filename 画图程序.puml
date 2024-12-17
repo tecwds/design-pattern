@@ -1,0 +1,65 @@
+@startuml
+
+' 定义接口和类
+interface Shape {
+    +draw()
+}
+
+class Circle implements Shape {
+    +draw()
+}
+
+class Rectangle implements Shape {
+    +draw()
+}
+
+class Triangle implements Shape {
+    +draw()
+}
+
+class CompositeShape implements Shape {
+'    -shapes: List<Shape>
+    +add(shape: Shape)
+    +remove(shape: Shape)
+    +draw()
+}
+
+class ShapeFactory {
+    +createCircle(): Shape
+    +createRectangle(): Shape
+    +createTriangle(): Shape
+}
+
+class Command {
+    +execute()
+    +undo()
+}
+
+class DrawCommand implements Command {
+'    -shape: Shape
+    +execute()
+    +undo()
+}
+
+class CommandManager {
+'    -commandHistory: Stack<Command>
+    +execute(command: Command)
+    +undo()
+    +redo()
+}
+
+' 定义关系
+ShapeFactory "1" -- "0..*" Shape : creates
+CompositeShape "1" -- "0..*" Shape : contains
+CommandManager "1" -- "0..*" Command : manages
+DrawCommand "1" -- "1" Shape : operates on
+
+' 定义单例
+class Singleton {
+'    -instance: Singleton
+    +getInstance(): Singleton
+}
+
+CommandManager ..|> Singleton : instanceof
+
+@enduml
